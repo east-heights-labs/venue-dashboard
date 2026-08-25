@@ -80,7 +80,7 @@ export default function LoginPage() {
               label="Password"
               type="password"
               placeholder="••••••••"
-              autoComplete="current-password"
+              autoComplete="off"
               error={errors.password?.message}
               {...register("password")}
             />
