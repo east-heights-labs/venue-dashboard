@@ -1,7 +1,10 @@
 /**
  * API client for OnStage backend.
- * All requests go through /api/* (Next.js proxy) to avoid CORS + keep credentials server-side.
+ * Uses Authorization: Bearer token (stored in localStorage) for auth.
+ * This avoids third-party cookie blocking in modern browsers.
  */
+
+import { getToken } from "./auth";
 
 const BACKEND = process.env.NEXT_PUBLIC_API_BASE ?? "https://ehl-backend-vercel.vercel.app";
 
@@ -14,11 +17,20 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getToken();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options?.headers as Record<string, string> ?? {}),
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const res = await fetch(`${BACKEND}${path}`, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...(options?.headers ?? {}) },
     ...options,
+    headers,
   });
+
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new ApiError(body?.error ?? res.statusText, res.status);
@@ -31,11 +43,27 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 // ---------------------------------------------------------------------------
 
 export const venueApi = {
-  login: (email: string, password: string) =>
-    request("/api/venue/login", {
+  /**
+   * Login returns the JWT token in the response body (not just cookie).
+   * We extract it and store in localStorage.
+   */
+  login: async (email: string, password: string): Promise<{ token: string }> => {
+    const res = await fetch(`${BACKEND}/api/venue/login`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-    }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new ApiError(body?.error ?? res.statusText, res.status);
+    }
+    const data = await res.json();
+    // Token comes from response body; fall back to extracting from cookie header won't work cross-origin
+    if (!data.token) {
+      throw new ApiError("No token in login response", 401);
+    }
+    return data;
+  },
 
   logout: () => request("/api/venue/logout", { method: "POST" }),
 
@@ -44,11 +72,22 @@ export const venueApi = {
       `/api/venue/accept-invite?token=${token}`
     ),
 
-  acceptInvite: (token: string, password: string) =>
-    request("/api/venue/accept-invite", {
+  acceptInvite: async (token: string, password: string): Promise<{ token: string }> => {
+    const res = await fetch(`${BACKEND}/api/venue/accept-invite`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, password }),
-    }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new ApiError(body?.error ?? res.statusText, res.status);
+    }
+    const data = await res.json();
+    if (!data.token) {
+      throw new ApiError("No token in response", 401);
+    }
+    return data;
+  },
 
   me: () =>
     request<{
@@ -103,12 +142,12 @@ export const venueApi = {
     ),
 
   // ---------------------------------------------------------------------------
-  // Tonight (venue-scoped events for today from main events endpoint)
+  // Tonight
   // ---------------------------------------------------------------------------
 
   getTonightEvents: (venueId: string, venueLat: number, venueLng: number) => {
     const today = new Date().toISOString().split("T")[0];
-    return request<{ events: Event[]; count: number }>(
+    return request<{ events: TmEvent[]; count: number }>(
       `/api/events?lat=${venueLat}&lng=${venueLng}&radius=0.5&date=${today}`
     );
   },

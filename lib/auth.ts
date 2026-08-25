@@ -1,7 +1,7 @@
 /**
  * Auth helpers — client-side session management.
- * JWT is stored in HttpOnly cookie by the backend.
- * We store a minimal non-sensitive session object in localStorage for UI state.
+ * JWT stored in localStorage (not cookie) to avoid third-party cookie blocking.
+ * Sent as Authorization: Bearer header on every API request.
  */
 
 export interface VenueSession {
@@ -15,7 +15,8 @@ export interface VenueSession {
   role: string;
 }
 
-const SESSION_KEY = "venue_session";
+const SESSION_KEY = "onstage_venue_session";
+const TOKEN_KEY = "onstage_venue_token";
 
 export function saveSession(session: VenueSession) {
   if (typeof window === "undefined") return;
@@ -35,10 +36,21 @@ export function getSession(): VenueSession | null {
 export function clearSession() {
   if (typeof window === "undefined") return;
   localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(TOKEN_KEY);
 }
 
 export function isLoggedIn(): boolean {
   return getSession() !== null;
+}
+
+export function saveToken(token: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function getToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(TOKEN_KEY);
 }
 
 export function formatTime(timeStr: string | null): string {

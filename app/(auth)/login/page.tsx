@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { venueApi, ApiError } from "@/lib/api";
-import { saveSession } from "@/lib/auth";
+import { saveSession, saveToken } from "@/lib/auth";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
@@ -18,14 +18,21 @@ type FormData = z.infer<typeof schema>;
 export default function LoginPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState("");
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+
+  // Clear server error when user starts typing again
+  const watchedFields = watch();
+  useEffect(() => {
+    setServerError("");
+  }, [watchedFields.email, watchedFields.password]);
 
   async function onSubmit(data: FormData) {
     setServerError("");
     try {
-      await venueApi.login(data.email, data.password);
+      const { token } = await venueApi.login(data.email, data.password);
+      saveToken(token);
       const me = await venueApi.me();
       saveSession({
         accountId: me.account.id,

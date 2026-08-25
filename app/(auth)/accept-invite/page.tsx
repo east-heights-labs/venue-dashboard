@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { venueApi, ApiError } from "@/lib/api";
-import { saveSession } from "@/lib/auth";
+import { saveSession, saveToken } from "@/lib/auth";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
@@ -41,7 +41,8 @@ function AcceptInviteContent() {
   async function onSubmit(data: FormData) {
     setServerError("");
     try {
-      await venueApi.acceptInvite(token, data.password);
+      const { token: jwt } = await venueApi.acceptInvite(token, data.password);
+      saveToken(jwt);
       const me = await venueApi.me();
       saveSession({
         accountId: me.account.id,
