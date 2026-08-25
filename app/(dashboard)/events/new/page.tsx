@@ -41,7 +41,7 @@ export default function NewEventPage() {
         price_max: data.price_max ? Number(data.price_max) : undefined,
         description: data.description || undefined,
       });
-      router.push("/dashboard/events");
+      router.push("/events");
     } catch (e) {
       setServerError(e instanceof ApiError ? e.message : "Something went wrong");
     }

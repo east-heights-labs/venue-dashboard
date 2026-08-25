@@ -6,11 +6,11 @@ import { clearSession, getSession } from "@/lib/auth";
 import { venueApi } from "@/lib/api";
 
 const NAV = [
-  { href: "/dashboard",            label: "Tonight",           icon: "🎵" },
-  { href: "/dashboard/events",     label: "Events",            icon: "📅" },
-  { href: "/dashboard/community",  label: "Community Reports", icon: "💬" },
-  { href: "/dashboard/qr",         label: "QR Code",           icon: "📲" },
-  { href: "/dashboard/followers",  label: "Followers",         icon: "👥" },
+  { href: "/",            label: "Tonight",           icon: "🎵" },
+  { href: "/events",     label: "Events",            icon: "📅" },
+  { href: "/community",  label: "Community Reports", icon: "💬" },
+  { href: "/qr",         label: "QR Code",           icon: "📲" },
+  { href: "/followers",  label: "Followers",         icon: "👥" },
 ];
 
 export function Sidebar({ communityCount = 0 }: { communityCount?: number }) {
@@ -52,7 +52,7 @@ export function Sidebar({ communityCount = 0 }: { communityCount?: number }) {
       {/* Nav */}
       <nav className="flex-1 py-4 flex flex-col gap-0.5 px-2 overflow-y-auto">
         {NAV.map(({ href, label, icon }) => {
-          const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+          const active = pathname === href || (href !== "/" && pathname.startsWith(href));
           return (
             <Link
               key={href}
@@ -85,7 +85,7 @@ export function Sidebar({ communityCount = 0 }: { communityCount?: number }) {
       {/* Bottom: settings + venue info */}
       <div className="border-t border-[#1E1E35] px-2 py-3 flex flex-col gap-0.5">
         <Link
-          href="/dashboard/settings"
+          href="/settings"
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#9B93C8] hover:text-[#F0EDFF] hover:bg-[#16162A] transition-all"
         >
           <span className="text-base shrink-0">⚙️</span>

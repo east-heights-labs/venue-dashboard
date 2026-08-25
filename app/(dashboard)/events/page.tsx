@@ -29,7 +29,7 @@ export default function EventsPage() {
           <h1 className="text-2xl font-bold tracking-tight text-[#F0EDFF]">Events</h1>
           <p className="text-sm text-[#9B93C8] mt-1">Your custom event listings</p>
         </div>
-        <Link href="/dashboard/events/new">
+        <Link href="/events/new">
           <Button variant="primary">+ New Event</Button>
         </Link>
       </div>
@@ -47,7 +47,7 @@ export default function EventsPage() {
         <div className="text-center py-20">
           <p className="text-[#9B93C8] text-sm">No custom events yet.</p>
           <p className="text-[#5A5380] text-xs mt-1">Add shows that aren't in Ticketmaster or JamBase.</p>
-          <Link href="/dashboard/events/new" className="mt-4 inline-block">
+          <Link href="/events/new" className="mt-4 inline-block">
             <Button variant="primary" size="sm">+ New Event</Button>
           </Link>
         </div>

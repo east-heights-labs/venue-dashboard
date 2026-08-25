@@ -72,7 +72,7 @@ export default function TonightPage() {
       <section className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-[#F0EDFF]">Tonight's Shows</h2>
-          <Link href="/dashboard/events/new">
+          <Link href="/events/new">
             <Button variant="secondary" size="sm">+ Add Show</Button>
           </Link>
         </div>
@@ -86,7 +86,7 @@ export default function TonightPage() {
           <div className="bg-[#0F0F1A] border border-[#1E1E35] rounded-xl p-8 text-center">
             <p className="text-[#9B93C8] text-sm">No shows tonight from your data sources.</p>
             <p className="text-[#5A5380] text-xs mt-1">Add a custom listing if there's a show not in Ticketmaster or JamBase.</p>
-            <Link href="/dashboard/events/new" className="mt-4 inline-block">
+            <Link href="/events/new" className="mt-4 inline-block">
               <Button variant="primary" size="sm">+ Add Show</Button>
             </Link>
           </div>
@@ -126,7 +126,7 @@ function CommunityReportTeaser({ venueId }: { venueId: string }) {
           <h3 className="text-sm font-semibold text-[#F0EDFF]">Community Reports</h3>
           <p className="text-xs text-[#9B93C8] mt-0.5">Fan-submitted stage times waiting for your review</p>
         </div>
-        <Link href="/dashboard/community">
+        <Link href="/community">
           <Button variant="secondary" size="sm">Review →</Button>
         </Link>
       </div>

@@ -6,7 +6,7 @@ import { getSession } from "@/lib/auth";
 export default function Root() {
   const router = useRouter();
   useEffect(() => {
-    router.replace(getSession() ? "/dashboard" : "/login");
+    router.replace(getSession() ? "/" : "/login");
   }, [router]);
   return null;
 }

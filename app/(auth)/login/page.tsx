@@ -44,7 +44,7 @@ export default function LoginPage() {
         email: me.account.email,
         role: me.account.role,
       });
-      router.push("/dashboard");
+      router.push("/");
     } catch (e) {
       setServerError(e instanceof ApiError ? e.message : "Something went wrong");
     }
