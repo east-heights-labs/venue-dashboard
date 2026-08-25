@@ -79,6 +79,30 @@ export const venueApi = {
     request(`/api/venue/events/${id}`, { method: "DELETE" }),
 
   // ---------------------------------------------------------------------------
+  // Community reports
+  // ---------------------------------------------------------------------------
+
+  getCommunityReports: (status = "pending") =>
+    request<{ reports: CommunityReport[]; count: number }>(
+      `/api/venue/community-reports?status=${status}`
+    ),
+
+  confirmReport: (id: string) =>
+    request(`/api/venue/community-reports/${id}/confirm`, { method: "POST" }),
+
+  flagReport: (id: string) =>
+    request(`/api/venue/community-reports/${id}/flag`, { method: "POST" }),
+
+  // ---------------------------------------------------------------------------
+  // Followers
+  // ---------------------------------------------------------------------------
+
+  getFollowers: () =>
+    request<{ total: number; daily: { date: string; count: number }[] }>(
+      "/api/venue/followers"
+    ),
+
+  // ---------------------------------------------------------------------------
   // Tonight (venue-scoped events for today from main events endpoint)
   // ---------------------------------------------------------------------------
 
@@ -120,6 +144,16 @@ export interface CreateEventPayload {
   price_max?: number;
   description?: string;
   image_url?: string;
+}
+
+export interface CommunityReport {
+  id: string;
+  artist_name: string;
+  event_date: string | null;
+  stage_time: string | null;
+  status: "pending" | "confirmed" | "flagged";
+  submitted_at: string | null;
+  event_id: string | null;
 }
 
 export interface TmEvent extends Record<string, unknown> {
