@@ -11,8 +11,8 @@ import { Button } from "@/components/ui/Button";
 const schema = z.object({
   title: z.string().min(1, "Event name required"),
   event_date: z.string().min(1, "Date required"),
-  doors_time: z.string().optional(),
-  stage_time: z.string().optional(),
+  doors_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:MM (e.g. 20:00)").optional().or(z.literal("")),
+  stage_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use HH:MM (e.g. 21:30)").optional().or(z.literal("")),
   ticket_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   price_min: z.string().optional(),
   price_max: z.string().optional(),
@@ -74,17 +74,22 @@ export default function NewEventPage() {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-[#9B93C8]">Doors open</label>
             <input
-              type="time"
+              type="text"
+              placeholder="20:00"
+              maxLength={5}
               {...register("doors_time")}
-              className="h-10 px-3 rounded-lg text-sm bg-[#0F0F1A] border border-[#1E1E35] text-[#F0EDFF] focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.15)] outline-none transition-all [color-scheme:dark]"
+              className="h-10 px-3 rounded-lg text-sm bg-[#0F0F1A] border border-[#1E1E35] text-[#F0EDFF] placeholder-[#5A5380] focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.15)] outline-none transition-all"
             />
+            {errors.doors_time && <p className="text-xs text-[#EF4444]">{errors.doors_time.message}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-[#9B93C8]">Show starts</label>
             <input
-              type="time"
+              type="text"
+              placeholder="21:30"
+              maxLength={5}
               {...register("stage_time")}
-              className="h-10 px-3 rounded-lg text-sm bg-[#0F0F1A] border border-[#1E1E35] text-[#F0EDFF] focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.15)] outline-none transition-all [color-scheme:dark]"
+              className="h-10 px-3 rounded-lg text-sm bg-[#0F0F1A] border border-[#1E1E35] text-[#F0EDFF] placeholder-[#5A5380] focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.15)] outline-none transition-all"
             />
           </div>
         </div>
