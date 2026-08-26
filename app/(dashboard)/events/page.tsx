@@ -17,7 +17,8 @@ export default function EventsPage() {
     .filter((e: VenueEvent) => e.event_date < new Date().toISOString().split("T")[0])
     .sort((a: VenueEvent, b: VenueEvent) => b.event_date.localeCompare(a.event_date));
 
-  async function handleCancel(id: string) {
+  async function handleCancel(id: string, title: string) {
+    if (!window.confirm(`Cancel "${title}"? This will mark the event as cancelled for fans.`)) return;
     await venueApi.updateEvent(id, { is_cancelled: true });
     mutate();
   }
@@ -79,7 +80,7 @@ export default function EventsPage() {
   );
 }
 
-function EventRow({ event, onCancel, past }: { event: VenueEvent; onCancel: (id: string) => void; past?: boolean }) {
+function EventRow({ event, onCancel, past }: { event: VenueEvent; onCancel: (id: string, title: string) => void; past?: boolean }) {
   return (
     <div className="bg-[#0F0F1A] border border-[#1E1E35] rounded-xl px-5 py-4 flex items-center gap-4 hover:border-[#2D2D50] transition-colors">
       <div className="flex-1 min-w-0">
@@ -100,10 +101,10 @@ function EventRow({ event, onCancel, past }: { event: VenueEvent; onCancel: (id:
 
       {!past && (
         <div className="shrink-0 flex gap-2">
-          <Link href={`/dashboard/events/${event.id}`}>
+          <Link href={`/events/${event.id}`}>
             <Button variant="secondary" size="sm">Edit</Button>
           </Link>
-          <Button variant="danger" size="sm" onClick={() => onCancel(event.id)}>Cancel</Button>
+          <Button variant="danger" size="sm" onClick={() => onCancel(event.id, event.title)}>Cancel</Button>
         </div>
       )}
     </div>
