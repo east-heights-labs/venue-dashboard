@@ -4,7 +4,7 @@
  * This avoids third-party cookie blocking in modern browsers.
  */
 
-import { getToken } from "./auth";
+import { getToken, touchActivity } from "./auth";
 
 const BACKEND = process.env.NEXT_PUBLIC_API_BASE ?? "https://ehl-backend-vercel.vercel.app";
 
@@ -35,6 +35,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const body = await res.json().catch(() => ({}));
     throw new ApiError(body?.error ?? res.statusText, res.status);
   }
+  touchActivity(); // reset idle timer on every successful authenticated request
   return res.json();
 }
 

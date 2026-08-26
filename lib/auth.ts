@@ -17,10 +17,13 @@ export interface VenueSession {
 
 const SESSION_KEY = "onstage_venue_session";
 const TOKEN_KEY = "onstage_venue_token";
+const ACTIVITY_KEY = "onstage_venue_last_activity";
+const IDLE_TIMEOUT_MS = 60 * 60 * 1000; // 60 minutes
 
 export function saveSession(session: VenueSession) {
   if (typeof window === "undefined") return;
   localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  touchActivity();
 }
 
 export function getSession(): VenueSession | null {
@@ -37,6 +40,7 @@ export function clearSession() {
   if (typeof window === "undefined") return;
   localStorage.removeItem(SESSION_KEY);
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(ACTIVITY_KEY);
 }
 
 export function isLoggedIn(): boolean {
@@ -52,6 +56,31 @@ export function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(TOKEN_KEY);
 }
+
+// ---------------------------------------------------------------------------
+// Idle timeout
+// ---------------------------------------------------------------------------
+
+export function touchActivity() {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(ACTIVITY_KEY, Date.now().toString());
+}
+
+/**
+ * Returns true if the session has been idle longer than IDLE_TIMEOUT_MS.
+ * Call this on dashboard mount. If true, clear session and redirect to /login.
+ */
+export function isSessionExpired(): boolean {
+  if (typeof window === "undefined") return false;
+  const raw = localStorage.getItem(ACTIVITY_KEY);
+  if (!raw) return true; // no activity record = treat as expired
+  const lastActivity = parseInt(raw, 10);
+  return Date.now() - lastActivity > IDLE_TIMEOUT_MS;
+}
+
+// ---------------------------------------------------------------------------
+// Formatting
+// ---------------------------------------------------------------------------
 
 export function formatTime(timeStr: string | null): string {
   if (!timeStr) return "—";

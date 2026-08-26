@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,8 +15,10 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const params = useSearchParams();
+  const timedOut = params.get("reason") === "timeout";
   const [serverError, setServerError] = useState("");
   const { register, handleSubmit, formState: { errors, isSubmitting }, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -74,6 +76,12 @@ export default function LoginPage() {
             <p className="text-xs text-[#5A5380] mt-0.5">Enter your venue account credentials</p>
           </div>
 
+          {timedOut && (
+              <p className="text-xs text-[#F59E0B] bg-[rgba(245,158,11,0.08)] border border-[#F59E0B]/20 rounded-lg px-3 py-2">
+                Your session expired after 60 minutes of inactivity.
+              </p>
+            )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input
               label="Email"
@@ -109,5 +117,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#07070F]" />}>
+      <LoginContent />
+    </Suspense>
   );
 }

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import { getSession } from "@/lib/auth";
+import { getSession, isSessionExpired, clearSession } from "@/lib/auth";
 import { venueApi } from "@/lib/api";
 import { Sidebar } from "@/components/layout/Sidebar";
 
@@ -16,6 +16,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const session = getSession();
     if (!session) {
       router.replace("/login");
+    } else if (isSessionExpired()) {
+      clearSession();
+      router.replace("/login?reason=timeout");
     } else {
       setAuthed(true);
     }
