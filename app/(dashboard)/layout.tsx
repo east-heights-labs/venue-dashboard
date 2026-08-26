@@ -8,21 +8,23 @@ import { Sidebar } from "@/components/layout/Sidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
-    // Only runs client-side after hydration — localStorage is available here
+    // Runs only client-side after hydration
+    setMounted(true);
     const session = getSession();
     if (!session) {
       router.replace("/login");
-    } else if (isSessionExpired()) {
+      return;
+    }
+    if (isSessionExpired()) {
       clearSession();
       router.replace("/login?reason=timeout");
-    } else {
-      setAuthed(true);
+      return;
     }
-    setReady(true);
+    setAuthed(true);
   }, [router]);
 
   const { data } = useSWR(
@@ -32,8 +34,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   );
   const pendingCount = data?.count ?? 0;
 
-  // Don't render anything until we've checked auth client-side
-  if (!ready || !authed) {
+  // Before hydration: render invisible shell so Next.js has valid HTML to serve
+  // After hydration: show spinner until auth confirmed, then render dashboard
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-[#07070F]" />
+    );
+  }
+
+  if (!authed) {
     return (
       <div className="min-h-screen bg-[#07070F] flex items-center justify-center">
         <div className="w-5 h-5 border-2 border-[#7C3AED]/30 border-t-[#7C3AED] rounded-full animate-spin" />
