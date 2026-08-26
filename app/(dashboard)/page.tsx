@@ -12,13 +12,14 @@ type AnyEvent = (TmEvent | VenueEvent) & { source: string; title: string; doors_
 
 export default function TonightPage() {
   const router = useRouter();
-  const session = getSession();
+  const [session, setSession] = useState<ReturnType<typeof getSession>>(null);
   const today = new Date().toISOString().split("T")[0];
 
-  // Redirect if no session
   useEffect(() => {
-    if (!session) router.replace("/login");
-  }, [session, router]);
+    const s = getSession();
+    if (!s) router.replace("/login");
+    else setSession(s);
+  }, [router]);
 
   // Fetch tonight's events near the venue
   const { data: nearbyData, isLoading: nearbyLoading, mutate: mutateNearby } = useSWR(
