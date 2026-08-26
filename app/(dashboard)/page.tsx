@@ -103,8 +103,10 @@ export default function TonightPage() {
                   stage_time: (event as VenueEvent).stage_time ?? (event as TmEvent).estimated_stage_time ?? null,
                   source: event.source,
                   ticket_url: (event as TmEvent).ticket_url,
+                  event_date: today,
                 }}
                 isVenueOwned={event.source === "venue"}
+                venueId={session.venueId}
                 onUpdated={() => { mutateNearby(); mutateOwn(); }}
               />
             ))}

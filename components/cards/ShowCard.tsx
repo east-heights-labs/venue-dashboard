@@ -15,8 +15,10 @@ interface ShowCardProps {
     stage_time: string | null;
     source: "venue" | "ticketmaster" | "jambase" | string;
     ticket_url?: string | null;
+    event_date?: string | null;
   };
   isVenueOwned?: boolean;
+  venueId?: string;
   onUpdated?: () => void;
 }
 
@@ -25,10 +27,11 @@ interface StageTimeForm {
   doors_time: string;
 }
 
-export function ShowCard({ event, isVenueOwned, onUpdated }: ShowCardProps) {
+export function ShowCard({ event, isVenueOwned, venueId, onUpdated }: ShowCardProps) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [showToast, setShowToast] = useState(false);
   const [currentStageTime, setCurrentStageTime] = useState(event.stage_time);
 
@@ -43,18 +46,32 @@ export function ShowCard({ event, isVenueOwned, onUpdated }: ShowCardProps) {
 
   async function onSave(data: StageTimeForm) {
     setSaving(true);
+    setSaveError("");
     try {
-      await venueApi.updateEvent(event.id, {
-        stage_time: data.stage_time || undefined,
-        doors_time: data.doors_time || undefined,
-      });
+      if (isVenueOwned) {
+        // Custom venue event — update directly in venue_events
+        await venueApi.updateEvent(event.id, {
+          stage_time: data.stage_time || undefined,
+          doors_time: data.doors_time || undefined,
+        });
+      } else {
+        // TM/JamBase event — submit as venue-confirmed stage report
+        if (!venueId) throw new Error("venueId required for stage report");
+        await venueApi.submitVenueStageReport(venueId, {
+          artist_name: event.title,
+          stage_time: data.stage_time,
+          doors_time: data.doors_time || undefined,
+          event_id: event.id,
+          event_date: event.event_date ?? undefined,
+        });
+      }
       setCurrentStageTime(data.stage_time);
       setSaved(true);
       setEditing(false);
       setShowToast(true);
       onUpdated?.();
     } catch (e) {
-      console.error(e);
+      setSaveError(e instanceof Error ? e.message : "Save failed — try again");
     } finally {
       setSaving(false);
     }
@@ -114,17 +131,21 @@ export function ShowCard({ event, isVenueOwned, onUpdated }: ShowCardProps) {
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-[#9B93C8]">Doors open</label>
                 <input
-                  type="time"
+                  type="text"
+                  placeholder="20:00"
+                  maxLength={5}
                   {...register("doors_time")}
-                  className="h-10 px-3 rounded-lg text-sm bg-[#0F0F1A] border border-[#1E1E35] text-[#F0EDFF] focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.15)] outline-none transition-all [color-scheme:dark]"
+                  className="h-10 px-3 rounded-lg text-sm bg-[#0F0F1A] border border-[#1E1E35] text-[#F0EDFF] placeholder-[#5A5380] focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.15)] outline-none transition-all"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-[#9B93C8]">Show starts</label>
                 <input
-                  type="time"
+                  type="text"
+                  placeholder="21:30"
+                  maxLength={5}
                   {...register("stage_time")}
-                  className="h-10 px-3 rounded-lg text-sm bg-[#0F0F1A] border border-[#1E1E35] text-[#F0EDFF] focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.15)] outline-none transition-all [color-scheme:dark]"
+                  className="h-10 px-3 rounded-lg text-sm bg-[#0F0F1A] border border-[#1E1E35] text-[#F0EDFF] placeholder-[#5A5380] focus:border-[#7C3AED] focus:shadow-[0_0_0_3px_rgba(124,58,237,0.15)] outline-none transition-all"
                 />
               </div>
             </div>
@@ -133,6 +154,12 @@ export function ShowCard({ event, isVenueOwned, onUpdated }: ShowCardProps) {
             <p className="text-xs text-[#5A5380]">
               Fans will see: <span className="text-[#9B93C8]">{event.title}</span> — Venue Confirmed ✓
             </p>
+
+            {saveError && (
+              <p className="text-xs text-[#EF4444] bg-[rgba(239,68,68,0.08)] border border-[#EF4444]/20 rounded-lg px-3 py-2">
+                {saveError}
+              </p>
+            )}
 
             <div className="flex gap-2 justify-end">
               <Button variant="secondary" size="sm" type="button" onClick={() => setEditing(false)}>

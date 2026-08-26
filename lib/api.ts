@@ -146,6 +146,19 @@ export const venueApi = {
   // Tonight
   // ---------------------------------------------------------------------------
 
+  // Submit a venue-confirmed stage time for any event (TM, JamBase, or custom)
+  submitVenueStageReport: (venueId: string, payload: {
+    artist_name: string;
+    stage_time: string;
+    doors_time?: string;
+    event_id?: string;
+    event_date?: string;
+  }) =>
+    request<{ ok: boolean; message: string }>(`/api/venue/${venueId}/stage-report`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
   getTonightEvents: (venueId: string, venueLat: number, venueLng: number) => {
     const today = new Date().toISOString().split("T")[0];
     return request<{ events: TmEvent[]; count: number }>(
