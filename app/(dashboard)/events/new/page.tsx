@@ -48,6 +48,7 @@ export default function NewEventPage() {
   }
 
   return (
+    <div className="flex-1 overflow-y-auto p-7">
     <div className="max-w-xl">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-[#F0EDFF]">New Event</h1>
@@ -138,6 +139,7 @@ export default function NewEventPage() {
           <Button type="submit" loading={isSubmitting}>Create Event</Button>
         </div>
       </form>
+    </div>
     </div>
   );
 }

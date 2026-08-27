@@ -34,7 +34,7 @@ export default function QRPage() {
   }
 
   return (
-    <div>
+    <div className="flex-1 overflow-y-auto p-7">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-[#F0EDFF]">Venue QR Code</h1>
         <p className="text-sm text-[#9B93C8] mt-1">Fans scan this to follow your venue and get show-night notifications</p>
