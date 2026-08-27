@@ -142,7 +142,7 @@ export default function TonightPage() {
       />
 
       <div className="flex-1 overflow-y-auto">
-        <div className="p-7">
+        <div className="px-8 py-6 max-w-[1400px] mx-auto">
 
           {/* ── Stat cards ── */}
           <div className="grid grid-cols-4 gap-3 mb-6">
