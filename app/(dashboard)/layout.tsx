@@ -53,7 +53,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-screen overflow-hidden bg-[#07070F]">
       <Sidebar communityCount={pendingCount} />
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden border-l border-[#1E1E35]">
         {children}
       </main>
     </div>

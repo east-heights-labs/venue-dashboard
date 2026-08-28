@@ -173,7 +173,7 @@ export default function TonightPage() {
           </div>
 
           {/* ── Two-column layout ── */}
-          <div className="grid grid-cols-[1fr_320px] gap-4 items-start">
+          <div className="grid grid-cols-[1fr_300px] gap-5 items-start">
 
             {/* Left: shows list */}
             <div>

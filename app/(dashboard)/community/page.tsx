@@ -26,7 +26,7 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-7">
+    <div className="flex-1 overflow-y-auto px-12 py-7">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-[#F0EDFF]">Community Reports</h1>
         <p className="text-sm text-[#9B93C8] mt-1">
