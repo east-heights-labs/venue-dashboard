@@ -5,7 +5,7 @@ export default function SettingsPage() {
   const session = getSession();
 
   return (
-    <div className="flex-1 overflow-y-auto px-12 py-7">
+    <div className="flex-1 overflow-y-auto px-12 py-7 max-w-screen-2xl">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-[#F0EDFF]">Settings</h1>
         <p className="text-sm text-[#9B93C8] mt-1">Venue profile and account</p>

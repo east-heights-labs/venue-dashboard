@@ -14,7 +14,7 @@ export default function FollowersPage() {
   const max = Math.max(...daily.map(d => d.count), 1);
 
   return (
-    <div className="flex-1 overflow-y-auto px-12 py-7">
+    <div className="flex-1 overflow-y-auto px-12 py-7 max-w-screen-2xl">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-[#F0EDFF]">Followers</h1>
         <p className="text-sm text-[#9B93C8] mt-1">Fans following {session?.venueName}</p>
