@@ -48,7 +48,7 @@ function LoginContent() {
       });
       router.push("/");
     } catch (e) {
-      setServerError(e instanceof ApiError ? e.message : "Something went wrong");
+      setServerError(e instanceof ApiError ? e.message : (e instanceof Error ? e.message : "Something went wrong. Please try again."));
     }
   }
 
